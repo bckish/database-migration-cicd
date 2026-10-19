@@ -1,0 +1,14 @@
+name: Validate migrations
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose up --wait
+      - run: docker compose exec -T postgres psql -U app -d app -c 'select count(*) from customers;'
+      - if: always()
+        run: docker compose down -v
