@@ -5,16 +5,15 @@ services:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
       POSTGRES_DB: app
-    ports: ["5432:5432"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U app -d app"]
       interval: 5s
       timeout: 3s
       retries: 12
   flyway:
-    image: flyway/flyway:10-alpine
+    image: flyway/flyway:13.13.0-alpine
     depends_on:
       postgres: {condition: service_healthy}
-    command: -url=jdbc:postgresql://postgres:5432/app -user=app -password=app -connectRetries=20 migrate
+    command: -url=jdbc:postgresql://postgres:5432/app -user=app -password=app -connectRetries=20 -locations=filesystem:/migrations migrate
     volumes:
-      - ./migrations:/flyway/sql:ro
+      - ./migrations:/migrations:ro
